@@ -1,0 +1,3 @@
+docutils>=0.11 # OSI-Approved Open Source, Public Domain
+sphinx>=4.0.0 # BSD
+sphinx-revealjs # Apache-2.0
