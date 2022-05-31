@@ -26,6 +26,9 @@ openstacksdk can report statistics on individual API requests/responses in sever
 * influxDB
 * prometheus 
 
+Configuration examples can be found at https://docs.openstack.org/openstacksdk/latest/user/guides/stats.html
+
+
 clouds.yaml
 -----------
 
@@ -42,8 +45,8 @@ clouds.yaml
         auth_url: https://mycloud.example.com:/v3
         project_name: myproject
         username: admin
-       domain_name: mytenant
-       region_name: europe
+        domain_name: mytenant
+      region_name: europe
   
 
 Sample metrics - statsd
@@ -51,35 +54,37 @@ Sample metrics - statsd
 
 .. code-block:: bash
 
-  Flushing stats at  Fri May 27 2022 13:45:17 GMT+0000 (Coordinated Universal Time)
+  Flushing stats at  Tue May 31 2022 21:29:36 GMT+0000 (Coordinated Universal Time)
   { counters:
      { 'statsd.bad_lines_seen': 0,
        'statsd.packets_received': 1,
-       'statsd.metrics_received': 2,
-       'openstack.api.identity.GET.projects': 1 },
-    timers: { 'openstack.api.identity.GET.projects': [ 16.479 ] },
+       'statsd.metrics_received': 3,
+       'openstack.api.identity.GET.projects.200': 1,
+       'openstack.api.identity.GET.projects.attempted': 1 },
+    timers: { 'openstack.api.identity.GET.projects.200': [ 15 ] },
     gauges: { 'statsd.timestamp_lag': 0 },
     timer_data:
-     { 'openstack.api.identity.GET.projects':
+     { 'openstack.api.identity.GET.projects.200':
         { count_90: 1,
-          mean_90: 16.479,
-          upper_90: 16.479,
-          sum_90: 16.479,
-          sum_squares_90: 271.557441,
+          mean_90: 15,
+          upper_90: 15,
+          sum_90: 15,
+          sum_squares_90: 225,
           std: 0,
-          upper: 16.479,
-          lower: 16.479,
+          upper: 15,
+          lower: 15,
           count: 1,
           count_ps: 0.1,
-          sum: 16.479,
-          sum_squares: 271.557441,
-          mean: 16.479,
-          median: 16.479 } },
+          sum: 15,
+          sum_squares: 225,
+          mean: 15,
+          median: 15 } },
     counter_rates:
      { 'statsd.bad_lines_seen': 0,
        'statsd.packets_received': 0.1,
-       'statsd.metrics_received': 0.2,
-       'openstack.api.identity.GET.projects': 0.1 },
+       'statsd.metrics_received': 0.3,
+       'openstack.api.identity.GET.projects.200': 0.1,
+       'openstack.api.identity.GET.projects.attempted': 0.1 },
     sets: {},
     pctThreshold: [ 90 ] }
 
@@ -87,6 +92,7 @@ Sample metrics - statsd
 Logging from Ansible playbooks
 ==============================
 
+Pull Request: https://opendev.org/openstack/ansible-collections-openstack
 
 Module specific log settings
 ----------------------------
@@ -114,7 +120,7 @@ Project cleanup SDK
   import queue
   import time
 
-  openstack.enable_logging(debug=True)
+  # openstack.enable_logging(debug=True)
 
   conn = openstack.connect()
 
@@ -123,11 +129,11 @@ Project cleanup SDK
                        filters={'created_at': '2020-07-29T19:00:00Z'}
                       )
   time.sleep(5)
-  whilenot status_queue.empty():
+  while not status_queue.empty():
       resource = status_queue.get_nowait()
       print('Deleting %s %s %s' % (type(resource),resource.name, resource.id))
   inp = input('Are you sure?')
-  ifinp == 'yes':
+  if inp == 'yes':
       conn.project_cleanup(dry_run=False, status_queue=status_queue,
                            filters={'created_at': '2020-07-29T19:00:00Z'}
 
@@ -202,7 +208,8 @@ Would you like to assess the amount of disk space used up by each of your projec
     quota=conn.block_storage.get_quota_set(project, usage=True)
     used_storage=str(quota.usage['gigabytes'])
     total_storage=str(quota.gigabytes)
-    print('; '.join(['Project Name: ' + project.name, 'Used Quota: ' + used_storage, 'Total Quota: ' + total_storage]))
+    print('; '.join(['Project Name: ' + project.name,
+                     'Used Quota: ' + used_storage, 'Total Quota: ' + total_storage]))
 
 
 Would you like to assess the amount of disk space used up by each of your projects in all domains?
@@ -214,13 +221,13 @@ Would you like to assess the amount of disk space used up by each of your projec
   conn = openstack.connect('demo')
   domains=conn.identity.domains()
   for domain in domains:
-      projects=conn.identity.projects(domain_id=domain.id)
-      for project in projects:
-          quota=conn.block_storage.get_quota_set(project, usage=True)
-          used_storage=str(quota.usage['gigabytes'])
-          total_storage=str(quota.gigabytes)
-          print('; '.join(['Domain Name: ' + domain.name, 'Project Name: ' + project.name, 
-    'Used Quota: ' + used_storage, 'Total Quota: ' + total_storage]))
+    projects=conn.identity.projects(domain_id=domain.id)
+    for project in projects:
+      quota=conn.block_storage.get_quota_set(project, usage=True)
+      used_storage=str(quota.usage['gigabytes'])
+      total_storage=str(quota.gigabytes)
+      print('; '.join(['Domain Name: ' + domain.name, 'Project Name: ' + project.name,
+                       'Used Quota: ' + used_storage, 'Total Quota: ' + total_storage]))
 
 
 Are all floating IPs are covered by security groups?
@@ -233,7 +240,6 @@ Are all floating IPs are covered by security groups?
 
   import openstack
   conn = openstack.connect('adminx')
-  fip={}
   for floating_ip in conn.network.ips():
     if floating_ip.name.startswith('80.158') and floating_ip.port_id:
       port=conn.network.get_port(floating_ip.port_id)
