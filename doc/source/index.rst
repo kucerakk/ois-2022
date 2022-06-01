@@ -5,14 +5,60 @@ OIS 2022 - SDK forum -  Solve Ops challenges in a Dev way for Starters with Open
 .. revealjs-slide::
    :theme: blood
 
-Provisioning - Openstack SDK, Ansible, Terraform
-================================================
+Provisioning - Openstack SDK
+============================
 
-Page one
---------
+Provisioning VM with SDK
+------------------------
 
-Page two
---------
+.. code-block:: python
+
+  import openstack
+  import base64
+  import random
+
+  conn = openstack.connect()
+  # openstack.enable_logging(debug=True)
+
+  FLAVOR_NAME = 's3.medium.1'
+  KEY_NAME = 'keypair-linux'
+  SERVER_NAME = 'server'
+  IMAGE_NAME = 'Standard_Fedora_35_latest'
+  NETWORK_NAME = 'network-linux'
+  AZ = ['eu-de-01', 'eu-de-02', 'eu-de-03']
+
+  image = conn.compute.find_image(IMAGE_NAME)
+  flavor = conn.compute.find_flavor(FLAVOR_NAME)
+  network = conn.network.find_network(NETWORK_NAME)
+
+  userdata = '''#!/bin/bash
+  mkdir /opt/data
+  mkfs.ext4 -L data /dev/vdb
+  echo "LABEL=data   /opt/data   auto   defaults,comment=userdata 0 2" >> /etc/fstab
+  mount /opt/data
+  '''
+
+  userdata = userdata.encode('utf-8', 'strict')
+  userdata_encoded = base64.b64encode(userdata).decode('utf-8')
+
+  for count in range(10):
+
+      az = random.choice(AZ)
+      server = conn.compute.create_server(
+               flavor_id=flavor.id,
+               image_id=image.id,
+               networks=[{"uuid": network.id}],
+               availability_zone=az,
+               user_data=userdata_encoded,
+               key_name=KEY_NAME,
+               block_device_mapping=[{"volume_size": 5, "source_type": "blank",
+                                      "destination_type": "volume"}],
+               name=SERVER_NAME+'-'+str(count)
+      )
+
+      server = conn.compute.wait_for_server(server)
+      print('Server ' + server.name + ' created in ' + az)
+
 
 Metrics collection
 ==================
