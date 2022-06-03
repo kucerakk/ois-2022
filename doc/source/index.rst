@@ -212,8 +212,8 @@ Project cleanup OSC
 
   $ openstack project  cleanup --dry-run --created-before 2022-04-18R0024:00:00 --auth-project
 
-Batch processing (scripts)
-==========================
+Challenge 5 - Batch processing (scripts)
+========================================
 
 * Flexibility
 * Combination of different scoped tokens and different cloud resources
