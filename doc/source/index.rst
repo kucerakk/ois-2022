@@ -138,7 +138,7 @@ Sample metrics - statsd
 Logging from Ansible playbooks
 ==============================
 
-Pull Request: https://opendev.org/openstack/ansible-collections-openstack
+Pull Request: https://review.opendev.org/c/openstack/ansible-collections-openstack/+/844559
 
 Module specific log settings
 ----------------------------
