@@ -5,8 +5,15 @@ OIS 2022 - SDK forum -  Solve Ops challenges in a Dev way for Starters with Open
 .. revealjs-slide::
    :theme: blood
 
-Provisioning - Openstack SDK
-============================
+Challenge 1 - Provisioning - Openstack SDK
+==========================================
+
+* Infrastructure as a code
+* Inventory
+* Desired state of infrastructure
+* Full cloud capabilities
+* Flexibility
+
 
 Provisioning VM with SDK
 ------------------------
@@ -60,11 +67,16 @@ Provisioning VM with SDK
       print('Server ' + server.name + ' created in ' + az)
 
 
-Metrics collection
-==================
+Challenge 2 - Monitoring
+========================
 
-Statistics reporting
---------------------
+* API monitoring
+* What metrics to collect
+* What tools to use
+
+
+Metrics collection with Openstack SDK
+-------------------------------------
 
 openstacksdk can report statistics on individual API requests/responses in several different formats:
 
@@ -75,8 +87,8 @@ openstacksdk can report statistics on individual API requests/responses in sever
 Configuration examples can be found at https://docs.openstack.org/openstacksdk/latest/user/guides/stats.html
 
 
-clouds.yaml
------------
+Configuration example and sample metrics
+----------------------------------------
 
 .. code-block:: yaml
 
@@ -94,9 +106,6 @@ clouds.yaml
         domain_name: mytenant
       region_name: europe
   
-
-Sample metrics - statsd
------------------------
 
 .. code-block:: bash
 
@@ -135,8 +144,12 @@ Sample metrics - statsd
     pctThreshold: [ 90 ] }
 
 
-Logging from Ansible playbooks
-==============================
+Challenge 3 - Logging
+=====================
+
+* Troubleshooting
+* Risk of potential  sensitive data leak
+* Lack of SDK log collection in Ansible
 
 Pull Request: https://review.opendev.org/c/openstack/ansible-collections-openstack/+/844559
 
@@ -154,11 +167,19 @@ Module specific log settings
        - name: List images
          openstack.cloud.image_info:
 
-Decommission (cleanup of resources)
-===================================
+Challenge 4 - Decommission (cleanup of resources)
+=================================================
+
+* Orphans
+* Deletion dependencies
+* Cleanup parameters
+* Potential higher costs
+
 
 Project cleanup SDK
 -------------------
+
+https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/project-cleanup.html
 
 .. code-block:: python
 
@@ -193,6 +214,12 @@ Project cleanup OSC
 
 Batch processing (scripts)
 ==========================
+
+* Flexibility
+* Combination of different scoped tokens and different cloud resources
+* Manipulation with objects
+* Effective batch processing tasks
+
 
 Do you need to create a batch of users from a CSV file?
 -------------------------------------------------------
@@ -291,3 +318,31 @@ Are all floating IPs are covered by security groups?
       port=conn.network.get_port(floating_ip.port_id)
       security_groups=port.security_group_ids
       print(floating_ip.name,security_groups,port.device_owner)
+
+
+
+Who has allocted floating IPs but not using it?
+-----------------------------------------------
+
+.. code-block:: python
+
+  import openstack
+  conn = openstack.connect('project')
+  fip={}
+  for floating_ip in conn.network.ips():
+    if floating_ip.name.startswith('80.158')
+      and not floating_ip.port_id:
+        fip[floating_ip.id] = {'project_id': floating_ip.project_id,
+                               'fip_id': floating_ip.id,
+                               'fip_status': floating_ip.status,
+                               'fip_address': floating_ip.name }
+  conn = openstack.connect('domain')
+  for key, value in fip.items():
+    try:
+      project=conn.identity.find_project(value['project_id'])
+      domain=conn.identity.get_domain(project.domain_id)
+      print(';'.join([domain.name, domain.id,
+                      value['project_id'], value['fip_id'],
+                      value['fip_status'], value['fip_address']]))
+    except Exception:
+      print('cannot find domain for EIP: %s %s' % (key, value))
