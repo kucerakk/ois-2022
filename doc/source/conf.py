@@ -4,6 +4,7 @@ extensions = [
 
 revealjs_static_path = ['_static']
 revealjs_css_files = ['custom.css', 'revealjs4/plugin/highlight/monokai.css']
+revealjs_style_theme = 'reveal_theme_otc.css'
 revealjs_script_plugins = [
     {
             "src": "revealjs4/plugin/highlight/highlight.js",

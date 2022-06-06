@@ -2,8 +2,6 @@
 OIS 2022 - SDK forum -  Solve Ops challenges in a Dev way for Starters with OpenStack
 =====================================================================================
 
-.. revealjs-slide::
-   :theme: blood
 
 Challenge 1 - Provisioning - Openstack SDK
 ==========================================
@@ -20,36 +18,28 @@ Provisioning VM with SDK
 
 .. code-block:: python
 
-  import openstack
-  import base64
-  import random
+  import openstack, base64, random
 
   conn = openstack.connect()
-  # openstack.enable_logging(debug=True)
-
   FLAVOR_NAME = 's3.medium.1'
   KEY_NAME = 'keypair-linux'
   SERVER_NAME = 'server'
   IMAGE_NAME = 'Standard_Fedora_35_latest'
   NETWORK_NAME = 'network-linux'
   AZ = ['eu-de-01', 'eu-de-02', 'eu-de-03']
-
   image = conn.compute.find_image(IMAGE_NAME)
   flavor = conn.compute.find_flavor(FLAVOR_NAME)
   network = conn.network.find_network(NETWORK_NAME)
 
   userdata = '''#!/bin/bash
-  mkdir /opt/data
-  mkfs.ext4 -L data /dev/vdb
+  mkdir /opt/data; mkfs.ext4 -L data /dev/vdb
   echo "LABEL=data   /opt/data   auto   defaults,comment=userdata 0 2" >> /etc/fstab
   mount /opt/data
   '''
-
   userdata = userdata.encode('utf-8', 'strict')
   userdata_encoded = base64.b64encode(userdata).decode('utf-8')
 
   for count in range(10):
-
       az = random.choice(AZ)
       server = conn.compute.create_server(
                flavor_id=flavor.id,
@@ -62,7 +52,6 @@ Provisioning VM with SDK
                                       "destination_type": "volume"}],
                name=SERVER_NAME+'-'+str(count)
       )
-
       server = conn.compute.wait_for_server(server)
       print('Server ' + server.name + ' created in ' + az)
 
@@ -87,8 +76,8 @@ openstacksdk can report statistics on individual API requests/responses in sever
 Configuration examples can be found at https://docs.openstack.org/openstacksdk/latest/user/guides/stats.html
 
 
-Configuration example and sample metrics
-----------------------------------------
+Configuration example
+---------------------
 
 .. code-block:: yaml
 
@@ -106,6 +95,9 @@ Configuration example and sample metrics
         domain_name: mytenant
       region_name: europe
   
+
+Sample metrics
+--------------
 
 .. code-block:: bash
 
@@ -321,7 +313,7 @@ Are all floating IPs are covered by security groups?
 
 
 
-Who has allocted floating IPs but not using it?
+Who has allocated floating IPs but not using it?
 -----------------------------------------------
 
 .. code-block:: python
