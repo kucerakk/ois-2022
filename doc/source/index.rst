@@ -3,8 +3,8 @@ OIS 2022 - SDK forum -  Solve Ops challenges in a Dev way for Starters with Open
 =====================================================================================
 
 
-Challenge 1 - Provisioning - Openstack SDK
-==========================================
+Challenge 1 - Provisioning
+==========================
 
 * Infrastructure as a code
 * Inventory
