@@ -284,24 +284,6 @@ Would you like to assess the amount of disk space used up by each of your projec
                      'Used Quota: ' + used_storage, 'Total Quota: ' + total_storage]))
 
 
-Would you like to assess the amount of disk space used up by each of your projects in all domains?
---------------------------------------------------------------------------------------------------
-
-.. code-block:: python
-
-  import openstack
-  conn = openstack.connect('demo')
-  domains=conn.identity.domains()
-  for domain in domains:
-    projects=conn.identity.projects(domain_id=domain.id)
-    for project in projects:
-      quota=conn.block_storage.get_quota_set(project, usage=True)
-      used_storage=str(quota.usage['gigabytes'])
-      total_storage=str(quota.gigabytes)
-      print('; '.join(['Domain Name: ' + domain.name, 'Project Name: ' + project.name,
-                       'Used Quota: ' + used_storage, 'Total Quota: ' + total_storage]))
-
-
 Are all floating IPs are covered by security groups?
 ----------------------------------------------------
 
