@@ -136,6 +136,13 @@ Sample metrics
     pctThreshold: [ 90 ] }
 
 
+Example Grafana Dashboard
+-------------------------
+
+.. figure:: _static/images/compute-service-statistics.png
+   :align: center
+   :width: 90%
+
 Challenge 3 - Logging
 =====================
 
