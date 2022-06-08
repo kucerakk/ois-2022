@@ -310,7 +310,6 @@ Are all floating IPs are covered by security groups?
   import openstack
   conn = openstack.connect('adminx')
 
-  import openstack
   conn = openstack.connect('adminx')
   for floating_ip in conn.network.ips():
     if floating_ip.name.startswith('80.158') and floating_ip.port_id:
