@@ -194,7 +194,6 @@ https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/pro
   conn.project_cleanup(dry_run=True, status_queue=status_queue,
                        filters={'created_at': '2020-07-29T19:00:00Z'}
                       )
-  time.sleep(5)
   while not status_queue.empty():
       resource = status_queue.get_nowait()
       print('Deleting %s %s %s' % (type(resource),resource.name, resource.id))
